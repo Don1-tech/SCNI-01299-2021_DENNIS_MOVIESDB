@@ -1,0 +1,420 @@
+/*
+SQLyog Professional v13.1.1 (64 bit)
+MySQL - 10.4.32-MariaDB : Database - movies
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`movies` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+
+USE `movies`;
+
+/*Table structure for table `admins` */
+
+DROP TABLE IF EXISTS `admins`;
+
+CREATE TABLE `admins` (
+  `admin_id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(50) NOT NULL,
+  PRIMARY KEY (`admin_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `audit_trail` */
+
+DROP TABLE IF EXISTS `audit_trail`;
+
+CREATE TABLE `audit_trail` (
+  `audit_id` int(11) NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(20) DEFAULT NULL,
+  `operation_type` varchar(20) DEFAULT NULL,
+  `change_by` int(11) DEFAULT NULL,
+  `date_changed` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `field_changed` varchar(20) DEFAULT NULL,
+  `old_value` varchar(50) DEFAULT NULL,
+  `new_value` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`audit_id`),
+  KEY `change_by` (`change_by`),
+  CONSTRAINT `audit_trail_ibfk_1` FOREIGN KEY (`change_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `cast` */
+
+DROP TABLE IF EXISTS `cast`;
+
+CREATE TABLE `cast` (
+  `movie_id` int(11) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `role_name` varchar(50) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `star_id` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  KEY `role_id` (`role_id`),
+  KEY `star_id` (`star_id`),
+  KEY `Name` (`user_id`) USING BTREE,
+  CONSTRAINT `cast_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `cast_ibfk_2` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`),
+  CONSTRAINT `cast_ibfk_3` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`),
+  CONSTRAINT `cast_ibfk_4` FOREIGN KEY (`star_id`) REFERENCES `movie_stars` (`star_id`),
+  CONSTRAINT `cast_ibfk_5` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `directors` */
+
+DROP TABLE IF EXISTS `directors`;
+
+CREATE TABLE `directors` (
+  `director_id` int(11) NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(20) DEFAULT NULL,
+  `last_name` varchar(20) DEFAULT NULL,
+  `nationality` varchar(20) DEFAULT NULL,
+  `DOB` date DEFAULT NULL,
+  `photo` varchar(50) DEFAULT NULL,
+  `gender` varchar(20) DEFAULT NULL,
+  `age` int(3) DEFAULT NULL,
+  `nationality_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`director_id`),
+  KEY `nationality_id` (`nationality_id`),
+  CONSTRAINT `directors_ibfk_1` FOREIGN KEY (`nationality_id`) REFERENCES `nationalities` (`country_id`) ON UPDATE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `genres` */
+
+DROP TABLE IF EXISTS `genres`;
+
+CREATE TABLE `genres` (
+  `genre_id` int(11) NOT NULL AUTO_INCREMENT,
+  `genre_name` varchar(20) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`genre_id`),
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `genres_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `languages` */
+
+DROP TABLE IF EXISTS `languages`;
+
+CREATE TABLE `languages` (
+  `language_id` int(11) NOT NULL AUTO_INCREMENT,
+  `language_name` varchar(20) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `added_by` int(11) DEFAULT NULL,
+  PRIMARY KEY (`language_id`),
+  KEY `deleted_by` (`deleted_by`),
+  KEY `added_by` (`added_by`),
+  CONSTRAINT `languages_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `languages_ibfk_2` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `media` */
+
+DROP TABLE IF EXISTS `media`;
+
+CREATE TABLE `media` (
+  `media_id` int(11) NOT NULL AUTO_INCREMENT,
+  `media_name` varchar(20) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `delted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  PRIMARY KEY (`media_id`),
+  KEY `delted_by` (`delted_by`),
+  CONSTRAINT `media_ibfk_1` FOREIGN KEY (`delted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_genres` */
+
+DROP TABLE IF EXISTS `movie_genres`;
+
+CREATE TABLE `movie_genres` (
+  `movie_id` int(11) DEFAULT NULL,
+  `genre_id` int(11) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `added_by` int(11) DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  KEY `added_by` (`added_by`),
+  CONSTRAINT `movie_genres_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `movie_genres_ibfk_2` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_languages` */
+
+DROP TABLE IF EXISTS `movie_languages`;
+
+CREATE TABLE `movie_languages` (
+  `movie_id` int(11) DEFAULT NULL,
+  `langauage_id` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `movie_languages_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_media` */
+
+DROP TABLE IF EXISTS `movie_media`;
+
+CREATE TABLE `movie_media` (
+  `media_id` int(11) DEFAULT NULL,
+  `movie_id` int(11) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `movie_media_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_production_company` */
+
+DROP TABLE IF EXISTS `movie_production_company`;
+
+CREATE TABLE `movie_production_company` (
+  `movie_id` int(111) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `movie_production_company_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_resolution` */
+
+DROP TABLE IF EXISTS `movie_resolution`;
+
+CREATE TABLE `movie_resolution` (
+  `movie_id` int(11) DEFAULT NULL,
+  `resolution_id` int(11) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `movie_resolution_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movie_stars` */
+
+DROP TABLE IF EXISTS `movie_stars`;
+
+CREATE TABLE `movie_stars` (
+  `star_id` int(11) NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(50) NOT NULL,
+  `last-name` varchar(50) DEFAULT NULL,
+  `DOB` date DEFAULT NULL,
+  `nationality` varchar(50) DEFAULT NULL,
+  `age` int(3) DEFAULT NULL,
+  `photo` varchar(50) DEFAULT NULL,
+  `gender` varchar(20) DEFAULT NULL,
+  `country_id` int(11) DEFAULT NULL,
+  `alist` tinyint(1) DEFAULT NULL,
+  `added_by` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  PRIMARY KEY (`star_id`),
+  KEY `movie_stars_ibfk_1` (`country_id`),
+  KEY `added_by` (`added_by`),
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `movie_stars_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `nationalities` (`country_id`),
+  CONSTRAINT `movie_stars_ibfk_3` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `movie_stars_ibfk_4` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `movies` */
+
+DROP TABLE IF EXISTS `movies`;
+
+CREATE TABLE `movies` (
+  `title` varchar(50) DEFAULT NULL,
+  `movie_id` int(11) NOT NULL AUTO_INCREMENT,
+  `country of origin` varchar(50) DEFAULT NULL,
+  `release_date` date DEFAULT NULL,
+  `genre` varchar(20) DEFAULT NULL,
+  `duration` time DEFAULT NULL,
+  `director_id` int(11) DEFAULT NULL,
+  `synopsis` varchar(255) DEFAULT NULL,
+  `poster` varchar(50) DEFAULT NULL,
+  `trailer` varchar(50) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `movie_status` enum('Upcoming','Released','cancelled') NOT NULL,
+  PRIMARY KEY (`movie_id`),
+  KEY `movies_ibfk_1` (`director_id`),
+  KEY `movies_ibfk_2` (`deleted_by`),
+  CONSTRAINT `movies_ibfk_1` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`),
+  CONSTRAINT `movies_ibfk_2` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `nationalities` */
+
+DROP TABLE IF EXISTS `nationalities`;
+
+CREATE TABLE `nationalities` (
+  `country_id` int(11) NOT NULL AUTO_INCREMENT,
+  `country_name` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`country_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `objects` */
+
+DROP TABLE IF EXISTS `objects`;
+
+CREATE TABLE `objects` (
+  `object_id` int(11) NOT NULL AUTO_INCREMENT,
+  `object_name` varchar(20) DEFAULT NULL,
+  `object_type` varchar(20) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`object_id`),
+  UNIQUE KEY `object_name` (`object_name`,`object_type`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `objects_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `privileges` */
+
+DROP TABLE IF EXISTS `privileges`;
+
+CREATE TABLE `privileges` (
+  `user_id` int(11) DEFAULT NULL,
+  `object-id` int(11) DEFAULT NULL,
+  `valid` tinyint(1) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `added_by` int(11) DEFAULT NULL,
+  KEY `user_id` (`user_id`),
+  KEY `object-id` (`object-id`),
+  KEY `added_by` (`added_by`),
+  CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `privileges_ibfk_2` FOREIGN KEY (`object-id`) REFERENCES `objects` (`object_id`) ON DELETE SET NULL,
+  CONSTRAINT `privileges_ibfk_3` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `production_companies` */
+
+DROP TABLE IF EXISTS `production_companies`;
+
+CREATE TABLE `production_companies` (
+  `company_id` int(11) DEFAULT NULL,
+  `company_name` varchar(50) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `added_by` int(11) DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  KEY `added_by` (`added_by`),
+  CONSTRAINT `production_companies_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `production_companies_ibfk_2` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `rating` */
+
+DROP TABLE IF EXISTS `rating`;
+
+CREATE TABLE `rating` (
+  `rating_id` int(11) NOT NULL AUTO_INCREMENT,
+  `value` int(11) DEFAULT NULL,
+  `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `added_by` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `movie_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`rating_id`),
+  KEY `movie_id` (`movie_id`),
+  KEY `added_by` (`added_by`),
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `rating_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE SET NULL,
+  CONSTRAINT `rating_ibfk_2` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `rating_ibfk_3` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `resolution` */
+
+DROP TABLE IF EXISTS `resolution`;
+
+CREATE TABLE `resolution` (
+  `resolution_id` int(11) NOT NULL AUTO_INCREMENT,
+  `resolution_name` varchar(50) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  PRIMARY KEY (`resolution_id`),
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `resolution_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `roles` */
+
+DROP TABLE IF EXISTS `roles`;
+
+CREATE TABLE `roles` (
+  `role_id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_description` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `trailers` */
+
+DROP TABLE IF EXISTS `trailers`;
+
+CREATE TABLE `trailers` (
+  `movie_id` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `date_deleted` datetime DEFAULT NULL,
+  `link` varchar(50) DEFAULT NULL,
+  KEY `deleted_by` (`deleted_by`),
+  CONSTRAINT `trailers_ibfk_1` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `users` */
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(50) DEFAULT NULL,
+  `last_name` varchar(50) DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `account_active` tinyint(1) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `phone` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `unique_username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
