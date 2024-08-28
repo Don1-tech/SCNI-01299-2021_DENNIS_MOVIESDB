@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form for Login and Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login">
+        <h1>Login</h1>
+        <form id="loginForm" action="login.php" method="post">
+            <label>Username</label> 
+            <input type="text" name="username" required>
+            <label>Password</label> 
+            <input type="password" name="password" required>
+            <input type="submit" value="Login">
+            <div id="errorMessage" style="color: red;"></div> <!-- Error message display -->
+        </form>
+    
+        <p>You do not have an Account? <a href="SignUp.html">Sign up here</a></p>
+    </div>
+    <div class="progress-bar" style="display: none;">
+        <span></span> <!-- Progress bar indicator -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var form = document.getElementById('loginForm');
+            var errorMessageDiv = document.getElementById('errorMessage');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = new FormData(form); // Use FormData to handle form data
+
+                // Show the progress bar
+                document.querySelector('.progress-bar').style.display = 'block';
+
+                fetch('login.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide the progress bar
+                    document.querySelector('.progress-bar').style.display = 'none';
+
+                    if (data.success) {
+                        // Redirect to the home page
+                        window.location.href = 'homepage.html'; // Ensure this file exists
+                    } else {
+                        // Display the error message
+                        errorMessageDiv.textContent = data.message;
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    errorMessageDiv.textContent = 'An error occurred. Please try again.';
+                    // Hide the progress bar
+                    document.querySelector('.progress-bar').style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

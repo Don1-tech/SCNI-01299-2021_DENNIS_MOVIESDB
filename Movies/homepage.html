@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Movie Database</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        /* Basic styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #888;
+            width: 30%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content form {
+            display: table;
+            width: 100%;
+        }
+
+        .modal-content label,
+        .modal-content input {
+            display: table-row;
+        }
+
+        .modal-content label {
+            display: table-cell;
+            padding: 5px;
+        }
+
+        .modal-content input {
+            display: table-cell;
+            padding: 5px;
+            width: calc(100% - 20px);
+        }
+
+        .modal-content button {
+            display: table-row;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="menu-group">
+                <div class="menu-icon" onclick="toggleDropdown()">
+                    &#9776; <!-- Three bars icon -->
+                </div>
+                <button onclick="toggleTable('cast')">Cast</button>
+                <button onclick="toggleTable('directors')">Directors</button>
+                <button onclick="toggleTable('movies')">Movies</button>
+                <button onclick="toggleTable('trailers')">Trailers</button>
+            </div>
+            <div class="user-settings-group">
+                <div class="user-settings">
+                    <div class="user-icon">U</div> <!-- Placeholder for user icon -->
+                    <div class="user-name">Username</div> <!-- Display logged-in user's name -->
+                    <button id="admin-button" onclick="goToAdminPage()">Admin Page</button> <!-- Button to navigate to admin page -->
+                    <div class="dropdown-menu">
+                        <button onclick="changeTheme('light')">Light Theme</button>
+                        <button onclick="changeTheme('dark')">Dark Theme</button>
+                        <button onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="cast" class="table-container" style="display: none;">No data available</div>
+            <div id="directors" class="table-container" style="display: none;">No data available</div>
+            <div id="movies" class="table-container" style="display: none;">
+                <table id="movies-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th class="wrap-synopsis">Synopsis</th>
+                            <!-- Table headers will be injected here by JavaScript -->
+                        </tr>
+                    </thead>
+                    <tbody id="movies-table-body">
+                        <!-- Movie rows will be injected here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="trailers" class="table-container" style="display: none;">No data available</div>
+        </div>
+    </div>
+
+    <!-- The Modal for Admin Authentication -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Admin Authentication</h2>
+            <form id="auth-form">
+                <label for="admin-username">Username:</label>
+                <input type="text" id="admin-username" name="username" required>
+                <br>
+                <label for="admin-password">Password:</label>
+                <input type="password" id="admin-password" name="password" required>
+                <br>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function fetchTableData(tableName) {
+            fetch(`fetch_table.php?table=${tableName}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById(tableName);
+                    container.innerHTML = ''; // Clear existing content
+
+                    if (data.error) {
+                        container.innerHTML = data.error;
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        container.innerHTML = 'No records found.';
+                        return;
+                    }
+
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+
+                    // Create table headers
+                    const headerRow = document.createElement('tr');
+                    Object.keys(data[0]).forEach(key => {
+                        const th = document.createElement('th');
+                        th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                        th.className = key === 'Synopsis' ? 'wrap-synopsis' : '';
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+
+                    // Create table rows
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        Object.keys(row).forEach(key => {
+                            const td = document.createElement('td');
+                            if (tableName === 'trailers' && row[key].includes('http')) {
+                                td.innerHTML = `<a href="${row[key]}" target="_blank">Watch Trailer</a>`;
+                            } else {
+                                td.textContent = row[key];
+                                if (key === 'Synopsis') {
+                                    td.className = 'wrap-synopsis'; // Apply class for synopsis column
+                                }
+                            }
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+                    container.appendChild(table);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function toggleTable(tableName) {
+            // Hide all tables
+            ['cast', 'directors', 'movies', 'trailers'].forEach(name => {
+                document.getElementById(name).style.display = 'none';
+            });
+
+            // Show the selected table
+            const table = document.getElementById(tableName);
+            table.style.display = 'block';
+
+            // Fetch and display data
+            if (tableName === 'movies') {
+                fetchTableData('movies');
+            }
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.dropdown-menu');
+            dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function logout() {
+            // Implement logout functionality
+            alert('Logout functionality not implemented.');
+        }
+
+        function goToAdminPage() {
+            // Show authentication modal
+            document.getElementById('auth-modal').style.display = 'block';
+        }
+
+        // Handle authentication form submission
+        document.getElementById('auth-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Collect form data
+            const formData = new FormData(this);
+
+            // Send data to PHP script
+            fetch('authenticate_admin.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Redirect to admin page upon successful authentication
+                    window.location.href = 'admin_page.html';
+                } else {
+                    alert('Invalid credentials');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Event listeners for modal close
+        var modal = document.getElementById('auth-modal');
+        var span = document.getElementsByClassName('close')[0];
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Change theme function
+        function changeTheme(theme) {
+            if (theme === 'light') {
+                document.body.style.backgroundColor = '#fff';
+                document.body.style.color = '#000';
+                document.querySelector('.top-bar').style.backgroundColor = '#ADD8E6'; // Light blue
+            } else if (theme === 'dark') {
+                document.body.style.backgroundColor = '#333';
+                document.body.style.color = '#fff';
+                document.querySelector('.top-bar').style.backgroundColor = '#555'; // Darker grey
+            }
+        }
+    </script>
+</body>
+</html>

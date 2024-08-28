@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form for Login and Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serialize(); // Serialize form data
+
+                // Show the progress bar
+                $('.progress-bar').show();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'register.php',
+                    data: formData,
+                    dataType: 'json',
+                    contentType: 'application/x-www-form-urlencoded',
+                    beforeSend: function() {
+                        // Start the progress bar
+                        $('.progress-bar span').css('width', '100%');
+                    },
+                    success: function(response) {
+                        var toast = document.createElement('div');
+                        toast.className = 'toast';
+                        toast.textContent = response.message;
+                        document.body.appendChild(toast);
+                        toast.classList.add('show');
+                        setTimeout(function() {
+                            toast.classList.remove('show');
+                            document.body.removeChild(toast);
+                        }, 3000);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        var toast = document.createElement('div');
+                        toast.className = 'toast';
+                        toast.textContent = "An error occurred.";
+                        document.body.appendChild(toast);
+                        toast.classList.add('show');
+                        setTimeout(function() {
+                            toast.classList.remove('show');
+                            document.body.removeChild(toast);
+                        }, 3000);
+                    },
+                    complete: function() {
+                        // Hide the progress bar after the request completes
+                        $('.progress-bar').hide();
+                        $('.progress-bar span').css('width', '0'); // Reset progress bar
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="signup">
+        <h1>Create an Account</h1>
+        <form action="register.php" method="post"> 
+            <label for="firstName">First Name</label> 
+            <input type="text" class="form-control" id="first_name" name="first_name" required>
+            <label for="last_name">Last Name</label> 
+            <input type="text" class="form-control" id="last_name" name="last_name" required>
+            <label for="userName">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+            <label for="phone">Phone</label> 
+            <input type="tel" name="phone" required>
+            <label for="email">Email</label> 
+            <input type="email" class="form-control" id="email" name="email" required>
+            <label for="password">Password</label> 
+            <input type="password" name="password" required>
+            <label for="confirmPassword">Confirm password</label> 
+            <input type="password" name="confirm_password" required>
+            <input type="submit" value="Register">
+        </form>
+        <p>By clicking on Register, you agree to our <br>
+        <a href="">Terms and conditions</a> and <a href="">Policy of privacy</a></p>
+        <p>Already have an Account? <a href="Login.html">Login here</a></p>
+    </div>
+    <div class="progress-bar" style="display: none;">
+        <span></span>
+    </div>
+</body>
+</html>

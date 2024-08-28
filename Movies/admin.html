@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="home.css">
+    <script>
+        // JavaScript code
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submission for adding movies
+            document.getElementById('add-movie-form').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Collect form data
+                const formData = new FormData(this);
+
+                // Send data to PHP script
+                fetch('add_movie.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(result => {
+                    alert(result); // Show result from PHP
+                    document.getElementById('add-movie-form').reset(); // Reset form
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // Navigation function to switch sections
+            function navigate(sectionId) {
+                const sections = document.querySelectorAll('.admin-section');
+                sections.forEach(section => {
+                    section.style.display = 'none'; // Hide all sections
+                });
+
+                const activeSection = document.getElementById(sectionId);
+                if (activeSection) {
+                    activeSection.style.display = 'block'; // Show active section
+                }
+            }
+
+            // Logout function
+            function logout() {
+                // Logic to handle logout (redirect, clear session, etc.)
+                window.location.href = 'login.html'; // Redirect to login page
+            }
+
+            // Event listeners for navigation buttons
+            document.querySelectorAll('.menu-group button').forEach(button => {
+                button.addEventListener('click', function() {
+                    navigate(this.getAttribute('onclick').split("'")[1]); // Extract section ID
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="top-bar">
+            <div class="menu-group">
+                <button onclick="navigate('add-movies')">Add Movies</button>
+                <button onclick="navigate('manage-trailers')">Manage Trailers</button>
+                <!-- Add more buttons as needed -->
+            </div>
+            <div class="user-settings">
+                <div class="user-icon">A</div>
+                <div class="user-name">Admin</div>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <!-- Content will change based on navigation -->
+            <div id="add-movies" class="admin-section">
+                <h2>Add Movie</h2>
+                <form id="add-movie-form">
+                    <label for="movie-title">Title:</label>
+                    <input type="text" id="movie-title" name="title" required>
+
+                    <label for="movie-description">Description:</label>
+                    <textarea id="movie-description" name="description" required></textarea>
+
+                    <label for="movie-release-date">Release Date:</label>
+                    <input type="date" id="movie-release-date" name="release_date" required>
+
+                    <label for="movie-poster">Poster URL:</label>
+                    <input type="text" id="movie-poster" name="poster_url" required>
+
+                    <button type="submit">Add Movie</button>
+                </form>
+            </div>
+            <!-- Add other sections like "Manage Trailers" here -->
+            <div id="manage-trailers" class="admin-section" style="display:none;">
+                <!-- Form for managing trailers -->
+                <h2>Manage Trailers</h2>
+                <!-- Add content and forms for managing trailers here -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

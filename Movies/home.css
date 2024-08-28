@@ -1,0 +1,247 @@
+/* Basic styles */
+body {
+    background: url('blurry.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Start aligning items from the top */
+    min-height: 100vh;
+}
+
+/* Container styles */
+.container {
+    width: 100%; /* Cover most of the page width */
+    max-width: 1200px; /* Increase maximum width */
+    margin: 0 auto; /* Center the container horizontally */
+    padding: 0 20px; /* Increase padding for better alignment */
+    box-sizing: border-box; /* Include padding in width */
+    display: flex; /* Flexbox to align items */
+    flex-direction: column; /* Stack children vertically */
+}
+
+/* Updated top-bar styles */
+.top-bar {
+    background-color: #1c8cb8; /* Light blue background */
+    color: rgb(145, 58, 7); /* Change text color to contrast with light blue */
+    padding: 10px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between; /* Space out the groups */
+    align-items: center; /* Align items vertically center */
+    box-shadow: 0 2px 4px rgba(148, 85, 85, 0.1);
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.menu-group, .user-settings-group {
+    display: flex;
+    align-items: center; /* Align items vertically center */
+}
+
+.menu-icon {
+    font-size: 30px; /* Increase size for better visibility */
+    cursor: pointer;
+}
+
+.top-bar button {
+    background: none;
+    border: none;
+    color: rgb(87, 61, 202);
+    font-size: 16px;
+    margin: 0 5px; /* Adjust margin to bring buttons closer */
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.top-bar button:hover {
+    background-color: #87CEEB; /* Hover effect */
+}
+
+/* User icon and dropdown menu */
+.user-settings {
+    display: flex;
+    align-items: center; /* Align user icon and name */
+    position: relative;
+    margin-left: 10px; /* Space between user settings and edge of page */
+}
+
+.user-icon {
+    width: 30px; /* Adjust size as needed */
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ddd; /* Background color for user icon */
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    margin-right: 8px; /* Space between user icon and name */
+}
+
+.user-name {
+    font-size: 12px; /* Adjust font size if needed */
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px; /* Position below the menu icon */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f0f0f0; /* Hover effect */
+}
+
+/* Content styles */
+.content {
+    width: 100%;
+    margin-top: 70px; /* Space for the fixed top bar */
+    padding: 0; /* No padding for the content area */
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    justify-content: center; /* Center tables horizontally */
+}
+
+.table-container {
+    background: #f0f0f0; /* Light grey background */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width of the container */
+    max-width: 1800px; /* Increase maximum width for larger screens */
+    margin: 10px auto; /* Center table with automatic margins */
+    border-radius: 10px; /* Add rounded edges */
+    overflow: hidden; /* Hide overflow */
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+}
+
+table {
+    width: 100%; /* Full width of the container */
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px; /* Padding for table cells */
+    text-align: left;
+}
+
+th {
+    background-color: #e0e0e0; /* Slightly darker grey for table headers */
+    white-space: nowrap; /* Prevent text wrapping in header */
+}
+
+td {
+    background-color: #fff; /* White background for data rows */
+    white-space: normal; /* Allow text to wrap */
+    overflow-wrap: break-word; /* Handle overflow */
+    border-bottom: 1px solid #ddd; /* Light grey border */
+}
+
+tr:nth-child(even) {
+    background-color: #f5f5f5; /* Slightly lighter grey for rows */
+}
+
+a {
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .top-bar button {
+        font-size: 14px; /* Smaller font size for buttons */
+        padding: 8px; /* Smaller padding for buttons */
+    }
+
+    .user-name {
+        display: none; /* Hide user name on small screens */
+    }
+
+    .user-icon {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .menu-icon {
+        font-size: 28px;
+    }
+
+    .top-bar button {
+        font-size: 14px;
+        padding: 8px;
+        margin: 5px 0; /* Adjust margin for vertical stack */
+    }
+}
+
+/* Synopsis text wrapping */
+.wrap-synopsis {
+    white-space: normal; /* Allow text to wrap */
+    max-width: 200px; /* Adjust width as needed */
+    overflow-wrap: break-word; /* Handle overflow */
+}
+/* Example styles in home.css */
+
+.admin-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.top-bar {
+    background-color: #1c8cb8;
+    color: rgb(145, 58, 7);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-group button, .user-settings button {
+    margin: 0 5px;
+}
+
+.admin-content {
+    margin-top: 20px;
+}
+
+.admin-section {
+    display: none; /* Sections are hidden by default */
+}
+
+/* Add more styles as needed */
